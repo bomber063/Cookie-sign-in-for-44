@@ -119,3 +119,23 @@ else if(path==='/sign_up'){
             min-width: 4em;
         }
 ```
+### 接下来我们应该把用户填写的东西发送给后台
+* 用户调填写了邮箱，密码和密码确认后点击注册，邮箱和密码没有问题(比如，密码和确认密码要一样，邮箱里面要有@等检查)，发送给服务器，然后保存在服务器后台的数据库中。
+* 需要用到JQuery，我们从[BootCDN](https://www.bootcdn.cn/)，这个**网站的信息相对全一点**,把script也放到HTML文件里面，这样就不用为js做路由了。
+* 用到监听[submit事件](https://www.jquery123.com/submit/).
+* [find()](https://www.jquery123.com/find/)通过一个选择器，jQuery对象，或元素过滤，得到当前匹配的元素集合中每个元素的后代。
+* [val()](https://www.jquery123.com/val/)获取匹配的元素集合中第一个元素的当前值或设置匹配的元素集合中每个元素的**值**。
+* js的监听注册后执行的代码
+```
+        $('#signUpForm').on('submit',(e)=>{
+            let hash={}
+            // console.log(e)//这里的e就是一堆的事件
+            e.preventDefault()
+            let need=['email','password','password_confirmation']
+            need.forEach((name)=>{
+                let value=$('#signUpForm').find(`[name=${name}]`).val()
+                hash[name]=value
+            })
+            console.log(hash)
+        })
+```
