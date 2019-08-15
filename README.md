@@ -159,3 +159,62 @@ else if(path==='/sign_up'){
     response.end()
   }
 ```
+* 当后端代码增加请求的方法的时候，这里的路由还需要考虑请求方法。
+```
+else if (path === '/sign_up' && method === 'GET') {//这里的method里面的GET要大写，并且使要满足这个路径和方法才可以走这个路由
+    let string = fs.readFileSync('./sign_up.html', 'utf8')
+    response.statusCode = 200
+    response.setHeader('Content-Type', 'text/html;charset=utf-8')
+    response.write(string)
+    response.end()
+  } else if (path === '/sign_up' && method === 'POST') {//当在这个路径是POST请求的时候就进这个路由
+    let string = fs.readFileSync('./sign_up.html', 'utf8')
+    response.statusCode = 200
+    response.end()
+  }
+```
+### 接下来需要服务器来读取前端用户用浏览器给的邮箱和密码
+* 我们在开发者工具里面看到post请求里面对应的最后一部分，也就是请求体Form Data 的view source里面可以看到邮箱，密码和密码确认啦。
+* node.js没有办法读取到这个请求体里面的数据。我们需要借助一些工具来读取。**为什么读取不到，因为Form Data是一段一段的上传的，就算去读取可能也只能读取到一段**，我们可以到google上搜node http get post data,可以找到[链接](https://stackoverflow.com/questions/4295782/how-to-process-post-data-in-node-js),我们可以找到这样一段代码
+```
+let body = [];
+request.on('data', (chunk) => {
+  body.push(chunk);
+}).on('end', () => {
+  body = Buffer.concat(body).toString();
+  // at this point, `body` has the entire request body stored in it as a string
+});
+```
+* 在node.js里面打出来的效果需要多打印几次才能看到结果，**因为前面几行不知道啥原因看不到，需要多点击几次，可能是这个版本node.js的bug**。
+* **这个结果需要在node.js里面查看，而不是浏览器中查看**.
+* 为什么这四个部分不是一下子就上传的呢，前面有说明过，见[链接——浏览器是先下载全部响应内容，然后再判断是不是400吗](https://github.com/bomber063/-achieve-AJAX-for-37),这里可以在举一个小例子，假设用户输入了一个一万个长度的用户名，是不可以把一万个长度的子一下子就传过来的。一般都是一点点，1kb或者多少kb/s的速度上传，上传过程中就会触发这个data事件
+* 这里用到jquery的API，[data事件](https://www.jquery123.com/event.data/),[end事件](https://www.jquery123.com/end/)终止在当前链的最新过滤操作，并返回匹配的元素的以前状态。
+* 后端代码修改如下
+```
+else if (path === '/sign_up' && method === 'POST') {//当在这个路径是POST请求的时候就进这个路由
+    let body = [];//请求体
+    request.on('data', (chunk) => {//监听request的data事件，每次data事件都会给一小块数据，这里用chunk表示
+      body.push(chunk);//把这个一小块数据，也就是chunk放到body数组里面。
+    }).on('end', () => {//当end的时候，也就是数据全部上传完了之后。
+      body = Buffer.concat(body).toString();//这里body就把里面的body数据全部合并起来
+      //这个Buffer不知道是什么东西，但是可以在node.js里面打出来看到是一个函数，下面的注释
+      // function Buffer(arg, encodingOrOffset,
+      //   length) {
+      //     showFlaggedDeprecation();
+      //     // Common case.
+      //     if (typeof arg === 'number') {
+      //       if (typeof encodingOrOffset === 'string') {
+      //         throw new ERR_INVALID_ARG_TYPE('string', 'string', arg);
+      //       }
+      //       return Buffer.alloc(arg);
+      //     }
+      //     return Buffer.from(arg, encodingOrOffset, length);
+      //   }
+
+      // at this point, `body` has the entire request body stored in it as a string
+      console.log(body)
+      response.statusCode = 200
+      response.end()
+    });
+  }
+```
