@@ -218,3 +218,28 @@ else if (path === '/sign_up' && method === 'POST') {//当在这个路径是POST�
     });
   }
 ```
+* 把后端获取到前面用户输入的信息的这个函数单独封装起来使用
+```
+function readbody(request){
+  return new Promise((resolve,reject)=>{
+    let body = [];//请求体
+    request.on('data', (chunk) => {//监听request的data事件，每次data事件都会给一小块数据，这里用chunk表示
+      body.push(chunk);//把这个一小块数据，也就是chunk放到body数组里面。
+    }).on('end', () => {//当end的时候，也就是数据全部上传完了之后。
+      body = Buffer.concat(body).toString();//这里body就把里面的body数据全部合并起来
+      resolve(body)//这里的body就是传给.then()成功后第一个函数的参数
+    })
+  })
+}
+```
+* 前面的代码拿到body就可以修改为
+```
+else if (path === '/sign_up' && method === 'POST') {//当在这个路径是POST请求的时候就进这个路由
+    readbody(request)
+    .then((body)=>{//这里的body就是封装函数readbody里面的成功后函数的里面的参数
+      console.log(body)//这里的body就是封装函数readbody里面的成功后函数的里面的参数
+      response.statusCode = 200
+      response.end()
+    })
+}
+```

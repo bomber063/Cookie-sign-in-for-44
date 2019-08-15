@@ -34,11 +34,17 @@ var server = http.createServer(function (request, response) {
     response.write(string)
     response.end()
   } else if (path === '/sign_up' && method === 'POST') {//当在这个路径是POST请求的时候就进这个路由
-    let body = [];//请求体
-    request.on('data', (chunk) => {//监听request的data事件，每次data事件都会给一小块数据，这里用chunk表示
-      body.push(chunk);//把这个一小块数据，也就是chunk放到body数组里面。
-    }).on('end', () => {//当end的时候，也就是数据全部上传完了之后。
-      body = Buffer.concat(body).toString();//这里body就把里面的body数据全部合并起来
+    readbody(request)
+    .then((body)=>{
+      console.log(body)//这里的body就是封装函数readbody里面的成功后函数的里面的参数
+      response.statusCode = 200
+      response.end()
+    })
+    // let body = [];//请求体
+    // request.on('data', (chunk) => {//监听request的data事件，每次data事件都会给一小块数据，这里用chunk表示
+    //   body.push(chunk);//把这个一小块数据，也就是chunk放到body数组里面。
+    // }).on('end', () => {//当end的时候，也就是数据全部上传完了之后。
+    //   body = Buffer.concat(body).toString();//这里body就把里面的body数据全部合并起来
       //这个Buffer不知道是什么东西，但是可以在node.js里面打出来看到是一个函数，下面的注释
       // function Buffer(arg, encodingOrOffset,
       //   length) {
@@ -54,10 +60,7 @@ var server = http.createServer(function (request, response) {
       //   }
 
       // at this point, `body` has the entire request body stored in it as a string
-      console.log(body)
-      response.statusCode = 200
-      response.end()
-    });
+    // });
   }
   else if (path === '/main.js') {
     let string = fs.readFileSync('./main.js', 'utf8')
@@ -99,6 +102,19 @@ var server = http.createServer(function (request, response) {
 
   /******** 代码结束，下面不要看 ************/
 })
+
+function readbody(request){
+  return new Promise((resolve,reject)=>{
+    let body = [];//请求体
+    request.on('data', (chunk) => {//监听request的data事件，每次data事件都会给一小块数据，这里用chunk表示
+      body.push(chunk);//把这个一小块数据，也就是chunk放到body数组里面。
+    }).on('end', () => {//当end的时候，也就是数据全部上传完了之后。
+      body = Buffer.concat(body).toString();//这里body就把里面的body数据全部合并起来
+      resolve(body)//Promise执行完毕成功后就会执行resolve这个函数，这个函数同样会返回
+    })
+  })
+}
+
 
 server.listen(port)
 console.log('监听 ' + port + ' 成功\n请用在空中转体720度然后用电饭煲打开 http://localhost:' + port)
