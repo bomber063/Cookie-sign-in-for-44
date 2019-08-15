@@ -139,3 +139,23 @@ else if(path==='/sign_up'){
             console.log(hash)
         })
 ```
+* 接下来我们post一下，也使用ajax来提交信息。用到jq的[jQuery.post()](https://www.jquery123.com/jQuery.post/)使用一个HTTP POST 请求从服务器加载数据。
+* 因为后端只有路径，没有get或者post的的方法要求。而且返回的是长得很像html的一串字符串,可以在开发者工具中的response中看到
+* 前端增加的代码
+```
+        $.post()//这个post请求发出去后，后台返回的是符合html语法的一串字符串，因为后端只有路径，没有get或者post的的方法要求。而且返回的也是一串字符串
+        .then(
+            (r)=>{console.log('成功',r)},//这里的r就是服务器返回的response，也就是符合html语法的字符串
+            ()=>{console.log('失败')}
+            )
+```
+* 后端的代码
+```
+else if(path==='/sign_up'){
+    let string = fs.readFileSync('./sign_up.html', 'utf8')
+    response.statusCode = 200
+    response.setHeader('Content-Type', 'text/html;charset=utf-8')
+    response.write(string)
+    response.end()
+  }
+```
