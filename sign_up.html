@@ -1,12 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            padding: 0px;
+            margin: 0px;
+        }
+
+        body {
+            border: 1px solid red;
+            /* vh不兼容IE，可以兼容手机端浏览器 */
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* coloumn变成纵向排列 */
+            flex-direction: column;
+        }
+
+        /* 这里可以直接写body里面是height：100%,或者还可以写成
+                html{
+            height:100%;
+        }
+        body{
+            min-height:100%;
+        }也可以实现西面19和22行代码选择器一起的效果，这个可以兼容IE浏览器 */
+        .form-wrap{
+            border:1px solid #ddd;
+            padding:20px;
+        }
+        .form-wrap .row{
+            margin:10px 0px;
+        }
+        .form-wrap .row> label{
+            display: inline-block;
+            min-width: 4em;
+        }
+    </style>
 </head>
+
 <body>
-    注册
+    <div class="form-wrap">
+        <h1>注册</h1>
+        <form>
+            <div class="row">
+                <label>邮箱</label>
+                <input type="text" name="email">
+            </div>
+            <div class="row">
+                <label>密码</label>
+                <input type="password" name="password">
+            </div>
+            <div class="row">
+                <label>确认密码</label>
+                <input type="password" name="password_confirmation">
+            </div>
+            <div class="row">
+                <input type="submit" value="注册">
+            </div>
+        </form>
+    </div>
 </body>
+
 </html>

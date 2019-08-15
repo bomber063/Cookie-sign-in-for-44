@@ -56,3 +56,66 @@ else if(path==='/sign_up'){
 * 这样当我们在主页找到路径/sign_up的时候就可以找到该sign_up.html网页啦,可以通过打开开发者工具中看到sign_up下面的Response,也就是响应体。
 * 我们在Response Header的view source里面还可以看到我们写的Content-Type: text/html;charset=utf-8
 * 此时可以先把cookie清空，点击cookie，在Application里面Storage里面的Cookies，里面有一个clear al，也就是禁止标志，一个圈里面一个斜杆——⊘
+
+### 增加代码达到注册界面的基本要求
+* html文件代码
+```
+    <div class="form-wrap">
+        <h1>注册</h1>
+        <form>
+            <div class="row">
+                <label>邮箱</label>
+                <input type="text" name="email">
+            </div>
+            <div class="row">
+                <label>密码</label>
+                <input type="password" name="password">
+            </div>
+            <div class="row">
+                <label>确认密码</label>
+                <input type="password" name="password_confirmation">
+            </div>
+            <div class="row">
+                <input type="submit" value="注册">
+            </div>
+        </form>
+    </div>
+```
+*  css样式代码
+```
+        * {
+            box-sizing: border-box;
+            padding: 0px;
+            margin: 0px;
+        }
+
+        body {
+            border: 1px solid red;
+            /* vh不兼容IE，可以兼容手机端浏览器 */
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* coloumn变成纵向排列 */
+            flex-direction: column;
+        }
+
+        /* 这里可以直接写body里面是height：100%,或者还可以写成
+                html{
+            height:100%;
+        }
+        body{
+            min-height:100%;
+        }也可以实现西面19和22行代码选择器一起的效果，这个可以兼容IE浏览器 */
+        .form-wrap{
+            border:1px solid #ddd;
+            padding:20px;
+        }
+        .form-wrap .row{
+            margin:10px 0px;
+        }
+        .form-wrap .row> label{
+            display: inline-block;
+            min-width: 4em;
+        }
+```
