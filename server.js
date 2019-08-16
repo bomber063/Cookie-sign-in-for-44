@@ -36,7 +36,16 @@ var server = http.createServer(function (request, response) {
   } else if (path === '/sign_up' && method === 'POST') {//当在这个路径是POST请求的时候就进这个路由
     readbody(request)
     .then((body)=>{
-      console.log(body)//这里的body就是封装函数readbody里面的成功后函数的里面的参数
+      let hash={}
+      let strings=body.split('&')//这里的string就被&分隔，所以得到新的数组[ 'email=111', 'password=222', 'password_confirmation=333' ]
+      strings.forEach((element) => {//这里的element就是前面的数组的三个元素
+        let parts=element.split('=')//这里的parts就是把email=111继续分隔为[email,111]
+        let key=parts[0]
+        let value=parts[1]
+        hash[key]=value//hash['email']='111'
+      });
+      console.log(hash)//这里就会打出{ email: '111', password: '222', password_confirmation: '333' }
+      // console.log(body)//这里的body就是封装函数readbody里面的成功后函数的里面的参数
       response.statusCode = 200
       response.end()
     })
