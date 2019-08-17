@@ -42,7 +42,7 @@ var server = http.createServer(function (request, response) {
           let parts = element.split('=')//这里的parts就是把email=111继续分隔为[email,111]
           let key = parts[0]
           let value = parts[1]
-          hash[key] = value//hash['email']='111'
+          hash[key] = decodeURIComponent(value)//decodeURIComponent可以解码@
         });
         // console.log(hash)//这里就会打出{ email: '111', password: '222', password_confirmation: '333' }
         // console.log(body)//这里的body就是封装函数readbody里面的成功后函数的里面的参数

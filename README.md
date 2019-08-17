@@ -375,5 +375,14 @@ else if (path === '/sign_up' && method === 'POST') {//当在这个路径是POST�
             }
 ```
 * **验证正确性这种一般后端是必须要验证的，前端有些是可以不验证的，因为有些人可以用curl来发请求**，比如你用在开发者工具对应的请求中找到copy->copy as curl然后再git bash中打开粘贴，然后输入回车后就可以看到后端的响应了。黑客可以很简单的跨过浏览器来发请求，**所以必须要确保后端是安全的，这个地方前端部分安全与否关系不大**
-* 目前的功能功能是验证必须要填写内容，比如验证密码是否匹配，邮箱是否有@等。不过这里的@还是有点问题的，还没编译。
+* 目前的功能功能是验证必须要填写内容，比如验证密码是否匹配，邮箱是否有@等。不过这里的@还是有点问题的，还没解释这个@。
+### 下面开始正式的登录
+* 一般密码是不能按照明文的格式存下来的，这里只是展示存储的过程，所以把密码按照明文存储下来。
+* 存储需要数据库，这里就建立一个笔记本来储存即可。
+* 首先修复前面的的这个@判断，因为JS的发明者李爵士说过如果JS中出现了@就要用%40来代替。用到一个API——[decodeURIComponent()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent)方法用于解码由 encodeURIComponent 方法或者其它类似方法编码的部分统一资源标识符（URI）。修改的代码为
+```
+          hash[key] = decodeURIComponent(value)//decodeURIComponent可以解码@
+```
+* 另一个node.js的API——[fs.writeFileSync](http://nodejs.cn/api/fs.html#fs_fs_writefilesync_file_data_options).用于在某个路径存储某些数据。
+
 
