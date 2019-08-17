@@ -323,6 +323,30 @@ else if (path === '/sign_up' && method === 'POST') {//当在这个路径是POST�
 ```
                         let {errors}=request.responseJSON
                         if(errors.email&&errors.email==='invalid'){//当errors存在并且等于'invalid'的时候告诉用户错在哪里
-                            alert('邮箱错误')
+                            alert('邮箱格式错误')
                         }
+```
+### 修改错误提示的样式
+* 前端jS代码
+```
+                        if(errors.email&&errors.email==='invalid'){//当errors存在并且等于'invalid'的时候告诉用户错在哪里
+                            $('#signUpForm').find('[name="email"]').siblings('.error').text('邮箱格式错误')
+                            // alert('邮箱格式错误')
+                        }
+```
+* 前端HTML代码增加
+```
+            <div class="row">
+                <label>邮箱</label>
+                <input type="text" name="email">
+                <span class="error"></span>
+            </div>
+```
+* 前端CSS增加最小宽度
+```
+        .form-wrap {
+            border: 1px solid #ddd;
+            padding: 20px;
+            min-width: 380px;
+        }
 ```

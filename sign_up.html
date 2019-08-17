@@ -34,6 +34,7 @@
         .form-wrap {
             border: 1px solid #ddd;
             padding: 20px;
+            min-width: 380px;
         }
 
         .form-wrap .row {
@@ -54,14 +55,17 @@
             <div class="row">
                 <label>邮箱</label>
                 <input type="text" name="email">
+                <span class="error"></span>
             </div>
             <div class="row">
                 <label>密码</label>
                 <input type="password" name="password">
+                <span class="error"></span>
             </div>
             <div class="row">
                 <label>确认密码</label>
                 <input type="password" name="password_confirmation">
+                <span class="error"></span>
             </div>
             <div class="row">
                 <input type="submit" value="注册">
@@ -93,7 +97,8 @@
                         // let {errors}=JSON. 
                         let {errors}=request.responseJSON
                         if(errors.email&&errors.email==='invalid'){//当errors存在并且等于'invalid'的时候告诉用户错在哪里
-                            alert('邮箱错误')
+                            $('#signUpForm').find('[name="email"]').siblings('.error').text('邮箱格式错误')
+                            // alert('邮箱格式错误')
                         }
                         // console.log(request.responseJSON)
                     }
