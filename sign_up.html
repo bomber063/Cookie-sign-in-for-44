@@ -74,16 +74,36 @@
     </div>
     <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
     <script>
-        $('#signUpForm').on('submit', (e) => {
+        let $form = $('#signUpForm')
+        $form.on('submit', (e) => {
             // console.log(e)//这里的e就是一堆的事件
             e.preventDefault()
             let hash = {}
             let need = ['email', 'password', 'password_confirmation']
             need.forEach((name) => {
-                let value = $('#signUpForm').find(`[name=${name}]`).val()
+                let value = $form.find(`[name=${name}]`).val()
                 hash[name] = value
             })
-            console.log(hash)
+            // $form.find('.error').text('')
+            $form.find('.error').each((value,index)=>{//这个是为了刚开始清空文字，不然文字会一直显示不会消失
+                $(index).text('')
+            })//这三行代码效果跟上面效果一样，只是感觉
+            if (hash['email'] === '') {
+                $form.find('[name="email"]').siblings('.error').text('请填写邮箱')
+                return//这里return代表就返回结束中止了，也就是不执行下面的post请求，如果不写，会继续执行下面的代码会导致显示邮箱格式错误。这里把下面加上else if也可以
+            }
+            if(hash['password']===''){
+                $form.find('[name="password"]').siblings('.error').text('请填写密码')
+                return//这里return代表就返回结束中止了，也就是不执行下面的post请求，如果不写，会继续执行下面的代码会导致显示邮箱格式错误。这里把下面加上else if也可以
+            }
+            if(hash['password_confirmation']===''){
+                $form.find('[name="password_confirmation"]').siblings('.error').text('填写确认密码')
+                return//这里return代表就返回结束中止了，也就是不执行下面的post请求，如果不写，会继续执行下面的代码会导致显示邮箱格式错误。这里把下面加上else if也可以
+            }
+            if(hash['password_confirmation']!==hash['password']){
+                $form.find('[name="password_confirmation"]').siblings('.error').text('密码不匹配')
+                return//这里return代表就返回结束中止了，也就是不执行下面的post请求，如果不写，会继续执行下面的代码会导致显示邮箱格式错误。这里把下面加上else if也可以
+            }
             $.post('/sign_up', hash)//这个post请求发出去后，后台返回的是符合html语法的一串字符串，因为后端只有路径，没有get或者post的的方法要求。而且返回的也是一串字符串
                 .then(
                     (r) => { console.log('成功', r) },//这里的r就是服务器返回的response，也就是符合html语法的字符串
@@ -95,9 +115,9 @@
                         // let { errors } = object//这句就意思就是上面一行代码的意思，是ES6的写法
                         // let {errors}=JSON.parse(request.responseText)//这一行代码把上面几行的代码缩减为这一行代码
                         // let {errors}=JSON. 
-                        let {errors}=request.responseJSON
-                        if(errors.email&&errors.email==='invalid'){//当errors存在并且等于'invalid'的时候告诉用户错在哪里
-                            $('#signUpForm').find('[name="email"]').siblings('.error').text('邮箱格式错误')
+                        let { errors } = request.responseJSON
+                        if (errors.email && errors.email === 'invalid') {//当errors存在并且等于'invalid'的时候告诉用户错在哪里
+                            $form.find('[name="email"]').siblings('.error').text('邮箱格式错误')
                             // alert('邮箱格式错误')
                         }
                         // console.log(request.responseJSON)

@@ -350,3 +350,30 @@ else if (path === '/sign_up' && method === 'POST') {//当在这个路径是POST�
             min-width: 380px;
         }
 ```
+### 如果用户没有写邮箱，那么就不需要麻烦后端，只需要前端来验证这个即可，当然就算前端验证了，后端也会验证是否没有写邮箱的。
+* 主要思路就是用if return或者if...else来判断，代码如下
+```
+            // $form.find('.error').text('')
+            $form.find('.error').each((value,index)=>{//这个是为了刚开始清空文字，不然文字会一直显示不会消失
+                $(index).text('')
+            })//这三行代码效果跟上面效果一样，只是感觉
+            if (hash['email'] === '') {
+                $form.find('[name="email"]').siblings('.error').text('请填写邮箱')
+                return//这里return代表就返回结束中止了，也就是不执行下面的post请求，如果不写，会继续执行下面的代码会导致显示邮箱格式错误。这里把下面加上else if也可以
+            }
+            if(hash['password']===''){
+                $form.find('[name="password"]').siblings('.error').text('请填写密码')
+                return//这里return代表就返回结束中止了，也就是不执行下面的post请求，如果不写，会继续执行下面的代码会导致显示邮箱格式错误。这里把下面加上else if也可以
+            }
+            if(hash['password_confirmation']===''){
+                $form.find('[name="password_confirmation"]').siblings('.error').text('填写确认密码')
+                return//这里return代表就返回结束中止了，也就是不执行下面的post请求，如果不写，会继续执行下面的代码会导致显示邮箱格式错误。这里把下面加上else if也可以
+            }
+            if(hash['password_confirmation']!==hash['password']){
+                $form.find('[name="password_confirmation"]').siblings('.error').text('密码不匹配')
+                return//这里return代表就返回结束中止了，也就是不执行下面的post请求，如果不写，会继续执行下面的代码会导致显示邮箱格式错误。这里把下面加上else if也可以
+            }
+```
+* **验证正确性这种一般后端是必须要验证的，前端有些是可以不验证的，因为有些人可以用curl来发请求**，比如你用在开发者工具对应的请求中找到copy->copy as curl然后再git bash中打开粘贴，然后输入回车后就可以看到后端的响应了。黑客可以很简单的跨过浏览器来发请求，**所以必须要确保后端是安全的，这个地方前端部分安全与否关系不大**
+* 目前的功能功能是验证必须要填写内容，比如验证密码是否匹配，邮箱是否有@等。不过这里的@还是有点问题的，还没编译。
+
