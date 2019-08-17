@@ -378,11 +378,29 @@ else if (path === '/sign_up' && method === 'POST') {//当在这个路径是POST�
 * 目前的功能功能是验证必须要填写内容，比如验证密码是否匹配，邮箱是否有@等。不过这里的@还是有点问题的，还没解释这个@。
 ### 下面开始正式的登录
 * 一般密码是不能按照明文的格式存下来的，这里只是展示存储的过程，所以把密码按照明文存储下来。
-* 存储需要数据库，这里就建立一个笔记本来储存即可。
+* 存储需要数据库，这里就建立一个笔记本来储存即可,增加一个文件夹db，db里面有一个文件为users。
 * 首先修复前面的的这个@判断，因为JS的发明者李爵士说过如果JS中出现了@就要用%40来代替。用到一个API——[decodeURIComponent()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent)方法用于解码由 encodeURIComponent 方法或者其它类似方法编码的部分统一资源标识符（URI）。修改的代码为
 ```
           hash[key] = decodeURIComponent(value)//decodeURIComponent可以解码@
 ```
 * 另一个node.js的API——[fs.writeFileSync](http://nodejs.cn/api/fs.html#fs_fs_writefilesync_file_data_options).用于在某个路径存储某些数据。
-
+* 对象是不方便保存的，对象是内存里面的东西，保存下来会显示[object Object]，必须转换为字符串，所以还要一个转换为字符串化的API——JSON.parsef
+* 如果前面已经存入了[object Object]，那么就要用到[try...catch](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/try...catch)语句将能引发错误的代码放在try块中，并且对应一个响应，然后有异常被抛出。catch子句包含try块中抛出异常时要执行的语句。也就是，你想让try语句中的内容成功， 如果没成功，你想控制接下来发生的事情，这时你可以在catch语句中实现。 如果在try块中有任何一个语句（或者从try块中调用的函数）抛出异常，控制立即转向catch子句。如果在try块中没有异常抛出，会跳过catch子句。
+* 修改后端的代码
+```
+else {
+          var users = fs.readFileSync('./db/users', 'utf8')//这里的路径必须要写上最前的点.
+          try {//尝试去执行这里面的代码
+            users = JSON.parse(users)//[]
+          } catch (error) {//如果try里面的代码执行有异常就放弃try里面的代码执行catch里面的代码,如果没有异常就跳过catch
+            users=[]
+          }
+          users.push({ email: email, password: password })//前面的email是字符串，后面的email是变量
+          var usersString=JSON.stringify(users)//把users字符串化
+          fs.writeFileSync('./db/users', usersString)//存储这个支付穿化后的users，也就是usersString
+          response.statusCode = 200
+          response.write('success')
+        }
+```
+* 还有问题存在，就是如果同样的注册内容会重复保存，所以要修复这个问题。
 

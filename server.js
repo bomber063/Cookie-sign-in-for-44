@@ -63,10 +63,19 @@ var server = http.createServer(function (request, response) {
           response.statusCode = 400
           response.write('password is not match')
         } else {
+          var users = fs.readFileSync('./db/users', 'utf8')//这里的路径必须要写上最前的点.
+          try {//尝试去执行这里面的代码
+            users = JSON.parse(users)//[]
+          } catch (error) {//如果try里面的代码执行有异常就放弃try里面的代码执行catch里面的代码,如果没有异常就跳过catch
+            users=[]
+          }
+          users.push({ email: email, password: password })//前面的email是字符串，后面的email是变量
+          var usersString=JSON.stringify(users)//把users字符串化
+          fs.writeFileSync('./db/users', usersString)//存储这个支付穿化后的users，也就是usersString
           response.statusCode = 200
           response.write('success')
         }
-        response.statusCode = 200
+        // response.statusCode = 200
         response.end()
       })
     // let body = [];//请求体
