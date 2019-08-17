@@ -35,40 +35,60 @@ var server = http.createServer(function (request, response) {
     response.end()
   } else if (path === '/sign_up' && method === 'POST') {//当在这个路径是POST请求的时候就进这个路由
     readbody(request)
-    .then((body)=>{
-      let hash={}
-      let strings=body.split('&')//这里的string就被&分隔，所以得到新的数组[ 'email=111', 'password=222', 'password_confirmation=333' ]
-      strings.forEach((element) => {//这里的element就是前面的数组的三个元素
-        let parts=element.split('=')//这里的parts就是把email=111继续分隔为[email,111]
-        let key=parts[0]
-        let value=parts[1]
-        hash[key]=value//hash['email']='111'
-      });
-      console.log(hash)//这里就会打出{ email: '111', password: '222', password_confirmation: '333' }
-      // console.log(body)//这里的body就是封装函数readbody里面的成功后函数的里面的参数
-      response.statusCode = 200
-      response.end()
-    })
+      .then((body) => {
+        let hash = {}
+        let strings = body.split('&')//这里的string就被&分隔，所以得到新的数组[ 'email=111', 'password=222', 'password_confirmation=333' ]
+        strings.forEach((element) => {//这里的element就是前面的数组的三个元素
+          let parts = element.split('=')//这里的parts就是把email=111继续分隔为[email,111]
+          let key = parts[0]
+          let value = parts[1]
+          hash[key] = value//hash['email']='111'
+        });
+        // console.log(hash)//这里就会打出{ email: '111', password: '222', password_confirmation: '333' }
+        // console.log(body)//这里的body就是封装函数readbody里面的成功后函数的里面的参数
+        // let email=hash['email']
+        // let password=hash['password']
+        // let password_confirmation=hash['password_confirmation']
+        let { email, password, password_confirmation } = hash//这一行代码代表前面三行代码，这是ES6的新的语法
+        // console.log(email,password,password_confirmation)
+        if (email.indexOf('@') === -1) {
+          response.statusCode = 400
+          response.setHeader('Content-Type', 'application/json;charset=utf-8')
+          response.write(`{
+            "errors":{
+              "email":"invalid"
+            }
+          }`)
+        } else if (password !== password_confirmation) {
+          response.statusCode = 400
+          response.write('password is not match')
+        } else {
+          response.statusCode = 200
+          response.write('success')
+        }
+        response.statusCode = 200
+        response.end()
+      })
     // let body = [];//请求体
     // request.on('data', (chunk) => {//监听request的data事件，每次data事件都会给一小块数据，这里用chunk表示
     //   body.push(chunk);//把这个一小块数据，也就是chunk放到body数组里面。
     // }).on('end', () => {//当end的时候，也就是数据全部上传完了之后。
     //   body = Buffer.concat(body).toString();//这里body就把里面的body数据全部合并起来
-      //这个Buffer不知道是什么东西，但是可以在node.js里面打出来看到是一个函数，下面的注释
-      // function Buffer(arg, encodingOrOffset,
-      //   length) {
-      //     showFlaggedDeprecation();
-      //     // Common case.
-      //     if (typeof arg === 'number') {
-      //       if (typeof encodingOrOffset === 'string') {
-      //         throw new ERR_INVALID_ARG_TYPE('string', 'string', arg);
-      //       }
-      //       return Buffer.alloc(arg);
-      //     }
-      //     return Buffer.from(arg, encodingOrOffset, length);
-      //   }
+    //这个Buffer不知道是什么东西，但是可以在node.js里面打出来看到是一个函数，下面的注释
+    // function Buffer(arg, encodingOrOffset,
+    //   length) {
+    //     showFlaggedDeprecation();
+    //     // Common case.
+    //     if (typeof arg === 'number') {
+    //       if (typeof encodingOrOffset === 'string') {
+    //         throw new ERR_INVALID_ARG_TYPE('string', 'string', arg);
+    //       }
+    //       return Buffer.alloc(arg);
+    //     }
+    //     return Buffer.from(arg, encodingOrOffset, length);
+    //   }
 
-      // at this point, `body` has the entire request body stored in it as a string
+    // at this point, `body` has the entire request body stored in it as a string
     // });
   }
   else if (path === '/main.js') {
@@ -112,8 +132,8 @@ var server = http.createServer(function (request, response) {
   /******** 代码结束，下面不要看 ************/
 })
 
-function readbody(request){
-  return new Promise((resolve,reject)=>{
+function readbody(request) {
+  return new Promise((resolve, reject) => {
     let body = [];//请求体
     request.on('data', (chunk) => {//监听request的data事件，每次data事件都会给一小块数据，这里用chunk表示
       body.push(chunk);//把这个一小块数据，也就是chunk放到body数组里面。

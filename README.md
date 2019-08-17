@@ -263,3 +263,66 @@ else if (path === '/sign_up' && method === 'POST') {//当在这个路径是POST�
       });
       console.log(hash)//这里就会打出{ email: '111', password: '222', password_confirmation: '333' }
 ```
+* 分别用一个变量储存邮箱，密码和确认密码
+```
+      // let email=hash['email']
+      // let password=hash['password']
+      // let password_confirmation=hash['password_confirmation']
+      let {email,password,password_confirmation}=hash//这一行代码代表前面三行代码，这是ES6的新的语法
+```
+### 接下来测试邮箱，密码和确认密码的正确和符合性
+* 用到API——[indexOf](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String/indexOf)方法返回调用它的 String 对象中第一次出现的指定值的索引，从 fromIndex 处进行搜索。**如果未找到该值，则返回 -1**。
+* 这里后端如果检测有误就会有提示，前端可以拿到后端的提示，也就是responseText，就可以提示给用户。
+* 后端有时候写的代码不一定用户能看懂，所以需要前端来翻译，比如后端写的response.write('bad email')，前端翻译为
+```
+            (request)=>{
+                if(request.responseText==='bad email')
+                alert('邮箱写错了')}
+            )
+        })
+```
+* 所以这里除了http协议，还有所谓的前后端协议，这个是前后端定的协议
+* 后端报错信息提供一个JSON,这是一个**字符串**
+```
+          response.write(`{
+            "errors":{
+              "email":"invalid"
+            }
+          }`)
+```
+* 把前端部分需要把这个符合JSON语法的报错信息字符串转换为一个对象。
+```
+                    (request) => {
+                        let object = JSON.parse(request.responseText)
+                        console.log(object)
+                    })
+```
+* 前端部分优化代码可以写成
+```
+                    (request) => {
+                        // if(request.responseText==='bad email')
+                        // alert('邮箱写错了')}//这里第一个请求a是对象,也就是request，第二个请求b是'error',第三个请求c是http的状态信息'Bad Request'
+                        // let object = JSON.parse(request.responseText)
+                        // let errors=object.errors
+                        // let { errors } = object//这句就意思就是上面一行代码的意思，是ES6的写法
+                        let {errors}=JSON.parse(request.responseText)//这一行代码把上面几行的代码缩减为这一行代码
+                        console.log(errors)
+                    }
+                )
+```
+* 前端部分用到[JSON.parse](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse)方法用来解析JSON字符串，构造由字符串描述的JavaScript值或对象。提供可选的reviver函数用以在返回之前对所得到的对象执行变换(操作)，这样会比较麻烦，**我们可以省略这一步**
+* 我们给后端代码中写上这个是JSON，修改一句代码,修改Content-Type
+```
+          response.setHeader('Content-Type', 'application/json;charset=utf-8')
+```
+* 前端部分就可以简化为
+```
+                        let {errors}=request.responseJSON
+```
+* 这样前端部分代码就可以简化为这两行就可以根据后端的响应来提示用户哪里有错误.
+```
+                        let {errors}=request.responseJSON
+                        if(errors.email&&errors.email==='invalid'){//当errors存在并且等于'invalid'的时候告诉用户错在哪里
+                            alert('邮箱错误')
+                        }
+```
