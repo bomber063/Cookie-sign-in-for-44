@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>注册界面</title>
+    <title>登陆界面</title>
     <style>
         * {
             box-sizing: border-box;
@@ -50,8 +50,8 @@
 
 <body>
     <div class="form-wrap">
-        <h1>注册</h1>
-        <form id="signUpForm">
+        <h1>登陆</h1>
+        <form id="signInForm">
             <div class="row">
                 <label>邮箱</label>
                 <input type="text" name="email">
@@ -63,23 +63,18 @@
                 <span class="error"></span>
             </div>
             <div class="row">
-                <label>确认密码</label>
-                <input type="password" name="password_confirmation">
-                <span class="error"></span>
-            </div>
-            <div class="row">
-                <input type="submit" value="注册">
+                <input type="submit" value="登陆">
             </div>
         </form>
     </div>
     <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
     <script>
-        let $form = $('#signUpForm')
+        let $form = $('#signInForm')
         $form.on('submit', (e) => {
             // console.log(e)//这里的e就是一堆的事件
             e.preventDefault()
             let hash = {}
-            let need = ['email', 'password', 'password_confirmation']
+            let need = ['email', 'password']
             need.forEach((name) => {
                 let value = $form.find(`[name=${name}]`).val()
                 hash[name] = value
@@ -96,15 +91,7 @@
                 $form.find('[name="password"]').siblings('.error').text('请填写密码')
                 return//这里return代表就返回结束中止了，也就是不执行下面的post请求，如果不写，会继续执行下面的代码会导致显示邮箱格式错误。这里把下面加上else if也可以
             }
-            if(hash['password_confirmation']===''){
-                $form.find('[name="password_confirmation"]').siblings('.error').text('填写确认密码')
-                return//这里return代表就返回结束中止了，也就是不执行下面的post请求，如果不写，会继续执行下面的代码会导致显示邮箱格式错误。这里把下面加上else if也可以
-            }
-            if(hash['password_confirmation']!==hash['password']){
-                $form.find('[name="password_confirmation"]').siblings('.error').text('密码不匹配')
-                return//这里return代表就返回结束中止了，也就是不执行下面的post请求，如果不写，会继续执行下面的代码会导致显示邮箱格式错误。这里把下面加上else if也可以
-            }
-            $.post('/sign_up', hash)//这个post请求发出去后，后台返回的是符合html语法的一串字符串，因为后端只有路径，没有get或者post的的方法要求。而且返回的也是一串字符串
+            $.post('/sign_in', hash)//这个post请求发出去后，后台返回的是符合html语法的一串字符串，因为后端只有路径，没有get或者post的的方法要求。而且返回的也是一串字符串
                 .then(
                     (r) => { console.log('成功', r) },//这里的r就是服务器返回的response，也就是符合html语法的字符串
                     (request) => {

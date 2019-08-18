@@ -67,23 +67,23 @@ var server = http.createServer(function (request, response) {
           try {//尝试去执行这里面的代码
             users = JSON.parse(users)//[]
           } catch (error) {//如果try里面的代码执行有异常就放弃try里面的代码执行catch里面的代码,如果没有异常就跳过catch
-            users=[]
+            users = []
           }
-          let inUser=false//判断先设置为false
-          for(i=0;i<users.length;i++){
-            let user=users[i]//把数据库里面的每个对象样式的字符串赋值给user
-            if(user.email===email){//如果数据库里面的邮箱和获取到用户的邮箱是一样的，那么就把inUser设置成true
-              inUser=true
+          let inUser = false//判断先设置为false
+          for (i = 0; i < users.length; i++) {
+            let user = users[i]//把数据库里面的每个对象样式的字符串赋值给user
+            if (user.email === email) {//如果数据库里面的邮箱和获取到用户的邮箱是一样的，那么就把inUser设置成true
+              inUser = true
               break;
             }
           }
-          if(inUser){//如果inUser是true那么就判断重复了
+          if (inUser) {//如果inUser是true那么就判断重复了
             response.statusCode = 400
             response.write('email is used')//这里可以复杂一点改成返回给前端一个JSON，这里就不麻烦了
           }
-          else{
+          else {
             users.push({ email: email, password: password })//前面的email是字符串，后面的email是变量
-            var usersString=JSON.stringify(users)//把users字符串化
+            var usersString = JSON.stringify(users)//把users字符串化
             fs.writeFileSync('./db/users', usersString)//存储这个字符串化后的users，也就是usersString
             response.statusCode = 200
             response.write('success')
@@ -113,6 +113,64 @@ var server = http.createServer(function (request, response) {
 
     // at this point, `body` has the entire request body stored in it as a string
     // });
+  }
+  else if (path === '/sign_in' && method === 'GET') {
+    let string = fs.readFileSync('./sign_in.html', 'utf8')
+    response.statusCode = 200
+    response.setHeader('Content-Type', 'text/html;charset=utf-8')
+    response.write(string)
+    response.end()
+  }
+  else if (path === '/sign_in' && method === 'POST') {
+    readbody(request)
+      .then((body) => {
+        let hash = {}
+        let strings = body.split('&')//这里的string就被&分隔，所以得到新的数组[ 'email=111', 'password=222', 'password_confirmation=333' ]
+        strings.forEach((element) => {//这里的element就是前面的数组的三个元素
+          let parts = element.split('=')//这里的parts就是把email=111继续分隔为[email,111]
+          let key = parts[0]
+          let value = parts[1]
+          hash[key] = decodeURIComponent(value)//decodeURIComponent可以解码@
+        });
+        // console.log(hash)//这里就会打出{ email: '111', password: '222', password_confirmation: '333' }
+        // console.log(body)//这里的body就是封装函数readbody里面的成功后函数的里面的参数
+        // let email=hash['email']
+        // let password=hash['password']
+        // let password_confirmation=hash['password_confirmation']
+        let { email, password } = hash//这一行代码代表前面三行代码，这是ES6的新的语法
+        // console.log(email,password,password_confirmation)
+        console.log('email',email)
+        console.log('password',password)
+
+        if (email.indexOf('@') === -1) {
+          response.statusCode = 400
+          response.setHeader('Content-Type', 'application/json;charset=utf-8')
+          response.write(`{
+          "errors":{
+            "email":"invalid"
+          }
+        }`)
+        }
+
+        var users = fs.readFileSync('./db/users', 'utf8')//这里的路径必须要写上最前的点.
+        users = JSON.parse(users)//这个是把能否储存的字符串对象化从而可以使用
+
+        let found=false
+        for(i=0;i<users.length;i++){
+          let user=users[i]
+          if(user.email===email&&user.password===password){//判断用户提供的邮箱和密码是否和数据库中的匹配
+            found=true
+            break
+          }
+        }
+        if(found){//如果匹配就200成功
+          response.statusCode = 200
+        }else{//如果不匹配就401验证失败
+          response.statusCode = 401//401的意思是邮箱密码等验证失败的代码
+        }
+
+        response.end()
+      })
   }
   else if (path === '/main.js') {
     let string = fs.readFileSync('./main.js', 'utf8')

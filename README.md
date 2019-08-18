@@ -425,4 +425,64 @@ else {
           }
 ```
 * 前端拿到后端返回的email is used之后可以翻译一下解释给用户也行。
+* 还存在问题就是理论上来说密码储存是需要加密的，用户输入密码后，会把这个密码再次加密后与之前数据库里面的加密的进行对比。
+***
+* 前面的都是注册页面，下面就先做一个**登陆页面**
+***
+### 做一个登陆页面
+* 创建一个等于页面的html，名字为sign-in，它的结构基本上和注册的页面很像。具体可以看代码。
+* 后端增加关于登陆界面的路由，包括get和post，这里的[401](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Status/401)代表客户端错误，指的是由于缺乏目标资源要求的身份验证凭证，发送的请求未得到满足。
+```
+  else if (path === '/sign_in' && method === 'GET') {
+    let string = fs.readFileSync('./sign_in.html', 'utf8')
+    response.statusCode = 200
+    response.setHeader('Content-Type', 'text/html;charset=utf-8')
+    response.write(string)
+    response.end()
+  }
+  else if (path === '/sign_in' && method === 'POST') {
+    readbody(request)
+      .then((body) => {
+        let hash = {}
+        let strings = body.split('&')//这里的string就被&分隔，所以得到新的数组[ 'email=111', 'password=222', 'password_confirmation=333' ]
+        strings.forEach((element) => {//这里的element就是前面的数组的三个元素
+          let parts = element.split('=')//这里的parts就是把email=111继续分隔为[email,111]
+          let key = parts[0]
+          let value = parts[1]
+          hash[key] = decodeURIComponent(value)//decodeURIComponent可以解码@
+        });
+        let { email, password } = hash//这一行代码代表前面三行代码，这是ES6的新的语法
+
+        if (email.indexOf('@') === -1) {
+          response.statusCode = 400
+          response.setHeader('Content-Type', 'application/json;charset=utf-8')
+          response.write(`{
+          "errors":{
+            "email":"invalid"
+          }
+        }`)
+        }
+
+        var users = fs.readFileSync('./db/users', 'utf8')//这里的路径必须要写上最前的点.
+        users = JSON.parse(users)//这个是把能否储存的字符串对象化从而可以使用
+
+        let found=false
+        for(i=0;i<users.length;i++){
+          let user=users[i]
+          if(user.email===email&&user.password===password){//判断用户提供的邮箱和密码是否和数据库中的匹配
+            found=true
+            break
+          }
+        }
+        if(found){//如果匹配就200成功
+          response.statusCode = 200
+        }else{//如果不匹配就401验证失败
+          response.statusCode = 401//401的意思是邮箱密码等验证失败的代码
+        }
+
+        response.end()
+      })
+  }
+```
+* 实际工作中应该会比这个复杂更多，比如**前端还可以去做一些验证，还没有去除空格等**
 
