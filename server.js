@@ -166,7 +166,13 @@ var server = http.createServer(function (request, response) {
         if(found){//如果匹配就200成功
           response.statusCode = 200
         }else{//如果不匹配就401验证失败
-          response.statusCode = 401//401的意思是邮箱密码等验证失败的代码
+          response.statusCode = 401//401的意思是邮箱密码等验证失败的代码，而且必须要放到该路由的最前面才可以
+          response.setHeader('Content-Type', 'application/json;charset=utf-8')
+          response.write(`{
+          "errors":{
+            "matchEmailAndPassword":"invalid"
+          }
+        }`)
         }
 
         response.end()

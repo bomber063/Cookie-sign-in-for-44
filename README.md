@@ -485,4 +485,34 @@ else {
   }
 ```
 * 实际工作中应该会比这个复杂更多，比如**前端还可以去做一些验证，还没有去除空格等**
+### 接下来如果登陆成功就跳转到首页
+* 增加一个简单的首页index.html，方便跳转用。
+* 用到一个跳转的API——[Location](https://developer.mozilla.org/en-US/docs/Web/API/HTMLHyperlinkElementUtils/href)和[Location.href](https://developer.mozilla.org/zh-CN/docs/Web/API/URLUtils/href)
+* [Location的W3school链接](https://www.w3school.com.cn/jsref/dom_obj_location.asp)
+* 前端部分增加成功后跳转到首页代码
+```
+                .then(
+                    (r) => {
+                        window.location.href = '/'
+                        console.log('成功', r)
+                    },//这里的r就是服务器返回的response，也就是符合html语法的字符串
+```
+* 邮箱或密码数据库中不存在，后端增加代码，不匹配的返回JSON信息
+```
+else{//如果不匹配就401验证失败
+          response.statusCode = 401//401的意思是邮箱密码等验证失败的代码，而且必须要放到该路由的最前面才可以
+          response.setHeader('Content-Type', 'application/json;charset=utf-8')
+          response.write(`{
+          "errors":{
+            "matchEmailAndPassword":"invalid"
+          }
+        }`)
+        }
+```
+* 前端获取到后端返回的信息判断后告诉用户邮箱或密码不匹配
+```
+                        if(errors.matchEmailAndPassword && errors.matchEmailAndPassword === 'invalid'){
+                            alert('账户或密码有误')
+                        }
+```
 
