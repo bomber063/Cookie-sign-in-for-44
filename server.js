@@ -69,11 +69,25 @@ var server = http.createServer(function (request, response) {
           } catch (error) {//如果try里面的代码执行有异常就放弃try里面的代码执行catch里面的代码,如果没有异常就跳过catch
             users=[]
           }
-          users.push({ email: email, password: password })//前面的email是字符串，后面的email是变量
-          var usersString=JSON.stringify(users)//把users字符串化
-          fs.writeFileSync('./db/users', usersString)//存储这个支付穿化后的users，也就是usersString
-          response.statusCode = 200
-          response.write('success')
+          let inUser=false//判断先设置为false
+          for(i=0;i<users.length;i++){
+            let user=users[i]//把数据库里面的每个对象样式的字符串赋值给user
+            if(user.email===email){//如果数据库里面的邮箱和获取到用户的邮箱是一样的，那么就把inUser设置成true
+              inUser=true
+              break;
+            }
+          }
+          if(inUser){//如果inUser是true那么就判断重复了
+            response.statusCode = 400
+            response.write('email is used')//这里可以复杂一点改成返回给前端一个JSON，这里就不麻烦了
+          }
+          else{
+            users.push({ email: email, password: password })//前面的email是字符串，后面的email是变量
+            var usersString=JSON.stringify(users)//把users字符串化
+            fs.writeFileSync('./db/users', usersString)//存储这个字符串化后的users，也就是usersString
+            response.statusCode = 200
+            response.write('success')
+          }
         }
         // response.statusCode = 200
         response.end()

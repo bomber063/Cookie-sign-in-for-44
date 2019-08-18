@@ -402,5 +402,27 @@ else {
           response.write('success')
         }
 ```
-* 还有问题存在，就是如果同样的注册内容会重复保存，所以要修复这个问题。
+* 还有问题存在，就是如果**同样的注册内容会重复保存，所以要修复这个问题**。增加部分代码来判断重复
+```
+          let inUser=false//判断先设置为false
+          for(i=0;i<users.length;i++){
+            let user=users[i]//把数据库里面的每个对象样式的字符串赋值给user
+            if(user.email===email){//如果数据库里面的邮箱和获取到用户的邮箱是一样的，那么就把inUser设置成true
+              inUser=true
+              break;
+            }
+          }
+          if(inUser){//如果inUser是true那么就判断重复了
+            response.statusCode = 400
+            response.write('email is used')//这里可以复杂一点改成返回给前端一个JSON，这里就不麻烦了
+          }
+          else{
+            users.push({ email: email, password: password })//前面的email是字符串，后面的email是变量
+            var usersString=JSON.stringify(users)//把users字符串化
+            fs.writeFileSync('./db/users', usersString)//存储这个字符串化后的users，也就是usersString
+            response.statusCode = 200
+            response.write('success')
+          }
+```
+* 前端拿到后端返回的email is used之后可以翻译一下解释给用户也行。
 
