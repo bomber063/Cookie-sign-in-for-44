@@ -542,12 +542,12 @@ else{//如果不匹配就401验证失败
 2. Cookie存在哪里——window里面存在C盘的一个文件里面，其他系统存在E盘文件，一般不让你去找到它，它不希望你改动它。
 3. 票能作假吗？是可以的。我们通过开发者工具里面的Application里面有一个Cookies，，**打开之后可以在Value中双击改动它,刷新之后看到请求里面的Cookie已经是改动之后的值了所以Cookie是不安全的，用户想改很容易，所以如果你在Cookie里面存了值，你是不能相信这个值的，用户稍微有点前端知识就可以更改这个Cookie**
 4. Cookie有有效期吗？是有的，有时候登陆会让你选择记住一周，这就是一周后失效。当然如果你不记住或者设置失效时间，本身默认的有效期有20分钟左右(这个左右是因为由浏览器自己决定)，比如你如果一直开着浏览器可能这个Cookie就长时间有效，如果你把浏览器关了，那么就会有一个默认浏览器失效时间来控制，如果你关闭后马上又再次打开，这个Cookie是还在的，但是你第二天再去打开肯定这个Cookie没有了，需要重新登陆。**这个有效期后端可以强制来设置**
- 1. 你可以设置cookie 的最长有效时间——Expires=<date> 可选
- 2. 你可以设置在 cookie 失效之前需要经过的秒数——Max-Age=<non-zero-digit> 可选，假如二者 （指 Expires 和Max-Age） 均存在，那么 Max-Age 优先级更高。
- 3. 指定 cookie 可以送达的主机名——Domain=<domain-value> ，一个网站只会带上自己域名的Cookie，是不会带上其他域名的Cookie，比如知乎在我的浏览器上有Cookie，百度在我的浏览器上有Cookie，但是你只能看到自己的Cookie，因为Cookie是按照域名分组的。
- 4. 指定一个 URL 路径——Path=<path-value> 可选
- 5. 一个带有安全属性的 cookie 只有在请求使用SSL和HTTPS协议的时候才会被发送到服务器——Secure 可选
- 6. 设置了 HttpOnly 属性的 cookie 不能使用 JavaScript 经由  Document.cookie 属性、XMLHttpRequest 和  Request APIs 进行访问，以防范跨站脚本攻击（XSS）——HttpOnly 可选，**这里说的是防止用户用JavaScript改，但是可以通过其他方式修改(比如在开发者工具中修改)。我们通过代码验证**
+  1. 你可以设置cookie 的最长有效时间——Expires=<date> 可选
+  2. 你可以设置在 cookie 失效之前需要经过的秒数——Max-Age=<non-zero-digit> 可选，假如二者 （指 Expires 和Max-Age） 均存在，那么 Max-Age 优先级更高。
+  3. 指定 cookie 可以送达的主机名——Domain=<domain-value> ，一个网站只会带上自己域名的Cookie，是不会带上其他域名的Cookie，比如知乎在我的浏览器上有Cookie，百度在我的浏览器上有Cookie，但是你只能看到自己的Cookie，因为Cookie是按照域名分组的。
+  4. 指定一个 URL 路径——Path=<path-value> 可选
+  5. 一个带有安全属性的 cookie 只有在请求使用SSL和HTTPS协议的时候才会被发送到服务器——Secure 可选
+  6. 设置了 HttpOnly 属性的 cookie 不能使用 JavaScript 经由  Document.cookie 属性、XMLHttpRequest 和  Request APIs 进行访问，以防范跨站脚本攻击（XSS）——HttpOnly 可选，**这里说的是防止用户用JavaScript改，但是可以通过其他方式修改(比如在开发者工具中修改)。我们通过代码验证**
 ```
 document.cookie就可以看到Cookie
 ```
@@ -559,7 +559,7 @@ document.cookie就可以看到Cookie
 ```
 document.cookie就看不到这个Cookie了
 ```
-7. 允许服务器设定一则 cookie 不随着跨域请求一起发送——SameSite=Lax 可选
+  7. 允许服务器设定一则 cookie 不随着跨域请求一起发送——SameSite=Lax 可选
 ### 用户登录后展示用户的信息
 * 用到node.js的一个API，通过在Google上查询nodejs read cookie,找到[链接](https://stackoverflow.com/questions/3393854/get-and-set-a-single-cookie-with-node-js-http-server),它就是request.headers.cookie,我们通过代码就可以在nodejs上看到cookie的结果啦
 ```
