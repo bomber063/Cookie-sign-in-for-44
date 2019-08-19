@@ -23,6 +23,34 @@ var server = http.createServer(function (request, response) {
 
   if (path === '/') {
     let string = fs.readFileSync('./index.html', 'utf8')
+    let cookie=request.headers.cookie.split('; ')//这里是分号空格来分隔这个cookie，这个cookie类似于a=1; b=2; sign_in_email=eee
+    let hash={}
+    for(i=0;i<cookie.length;i++){
+      let parts=cookie[i].split('=')//继续用=来分隔这个cookie
+      let key=parts[0]//第一部分就是前面设置的cookie名字          response.setHeader('Set-Cookie',`sign_in_email=${email};HttpOnly`)
+      let value=parts[1]//这个第二部分就是cookie的值，对应邮箱
+      hash[key]=value//把所有的信息都存入这个hash
+      // console.log(hash)
+      console.log(hash)
+    }
+    let email=hash.sign_in_email
+    let users=fs.readFileSync('./db/users','utf8')//读取数据库中存储的信息
+    users=JSON.parse(users)//把数据库中的字符串转换为对象
+    let found=false
+    for(i=0;i<users.length;i++){
+      if(users[i].email===email){//如果数据库中有一个邮箱和用户的邮箱(也就是cookie的值)相同，就停止退出并把found=true
+        found=true
+        // console.log(users)
+        break
+      }
+    }
+    if(found){
+      string=string.replace('__zhan__', email)//如果found=true说明这个Cookie的值没问题，就把占位符替换，显示用户的邮箱
+    }
+    else{
+      string=string.replace('__zhan__', '不知道')//如果found=false说明这个Cookie的值有问题，就把占位符替换，显示不知道
+    }
+
     response.statusCode = 200
     response.setHeader('Content-Type', 'text/html;charset=utf-8')
     response.write(string)
@@ -139,8 +167,6 @@ var server = http.createServer(function (request, response) {
         // let password_confirmation=hash['password_confirmation']
         let { email, password } = hash//这一行代码代表前面三行代码，这是ES6的新的语法
         // console.log(email,password,password_confirmation)
-        console.log('email',email)
-        console.log('password',password)
 
         if (email.indexOf('@') === -1) {
           response.statusCode = 400
@@ -164,6 +190,7 @@ var server = http.createServer(function (request, response) {
           }
         }
         if(found){//如果匹配就200成功
+          response.setHeader('Set-Cookie', `sign_in_email=${email}`)
           response.statusCode = 200
         }else{//如果不匹配就401验证失败
           response.statusCode = 401//401的意思是邮箱密码等验证失败的代码，而且必须要放到该路由的最前面才可以

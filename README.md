@@ -485,6 +485,10 @@ else {
   }
 ```
 * 实际工作中应该会比这个复杂更多，比如**前端还可以去做一些验证，还没有去除空格等**
+* 注册成功就跳转到登陆界面
+```
+                        window.location.href = '/sign_in'//注册成功之后跳转到登陆界面
+```
 ### 接下来如果登陆成功就跳转到首页
 * 增加一个简单的首页index.html，方便跳转用。
 * 用到一个跳转的API——[Location](https://developer.mozilla.org/en-US/docs/Web/API/HTMLHyperlinkElementUtils/href)和[Location.href](https://developer.mozilla.org/zh-CN/docs/Web/API/URLUtils/href)
@@ -515,4 +519,110 @@ else{//如果不匹配就401验证失败
                             alert('账户或密码有误')
                         }
 ```
+### 引入cookie这个主题
+* 目前存在2个问题
+1. 目前来看没有办法阻止来访问首页，就是直接输入主页地址也是可以跳转的，根本不需要邮箱和密码来跳转，**说明就算不登录也可以看到登陆后的内容，如果是这样用户就没必要登陆，这个要想个办法解决**。
+2. **登陆之后能否把邮箱名字显示在某个位置**，方便用户知道是自己登陆了。
+* 此时就需要引入[cookie](https://zhuanlan.zhihu.com/p/22396872?refer=study-fe)啦，它是一个请求头，告诉你你是谁
+* 维基百科关于[cookie链接](https://zh.wikipedia.org/wiki/Cookie)，MDN关于[cookie链接](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Cookie)
+* 什么时候需要设置cookie——**就是在登陆成功的一瞬间你需要设置cookie**
+* 用到的API——[set-cookie](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Set-Cookie)被用来由服务器端向客户端发送 cookie，我们后端加上一句代码
+```
+          response.setHeader('Set-Cookie',`sign_in_email=${email}`)
+```
+* 这样我们登陆成功后就会带上这个设置的cookie，怎么看到呢？我们把perserve log打开，然后登陆成功后就可以看到sign_in和主页的两个请求，一个是POST一个是GET，我们可以看到sign_in的Response Headers的view source里面多了一个Set-Cookie: sign_in_email=**你输入的邮箱**,然后再你的请求Request Header的view source里面也会**自动带上Cookie: sign_in_email=你设置的邮箱，主页的GET请求Request Headers里面的view source也会带上这个Cookie: sign_in_email=你设置的邮箱的请求头**
+* 说明只要后端响应了一个cookie头，**从此以后，只要是相同的源(或者相同的域名)访问都需要带上这个cookie头**
+* 这个cookie类似于去公园给你(响应)的一张票，每次进公园（请求）都需要出示这张票，不然不能进去。
+* cookie特点
+1. 服务器通过Set-Cookie响应头设置Cookie
+2. 浏览器得到Cookie之后，每次请求都要带上Cookie
+3. 服务器读取Cookie就知道登陆用户的信息(比如email)
+* 问题
+1. 如果在Chrome登陆得到Cookie，用Safari访问，Safari会带上Cookie吗？不会，比如你在chrome浏览器登陆知乎，那么你在手机上还是需要重新登陆知乎。它只认识那张票(cookie)，这个票(cookie)是跟着浏览器走的。
+2. Cookie存在哪里
+1. window里面存在C盘的一个文件里面，其他系统存在E盘文件，一般不让你去找到它，它不希望你改动它。
+3. 票能作假吗？是可以的。我们通过开发者工具里面的Application里面有一个Cookies，，**打开之后可以在Value中双击改动它,刷新之后看到请求里面的Cookie已经是改动之后的值了所以Cookie是不安全的，用户想改很容易，所以如果你在Cookie里面存了值，你是不能相信这个值的，用户稍微有点前端知识就可以更改这个Cookie**
+4. Cookie有有效期吗？是有的，有时候登陆会让你选择记住一周，这就是一周后失效。当然如果你不记住或者设置失效时间，本身默认的有效期有20分钟左右(这个左右是因为由浏览器自己决定)，比如你如果一直开着浏览器可能这个Cookie就长时间有效，如果你把浏览器关了，那么就会有一个默认浏览器失效时间来控制，如果你关闭后马上又再次打开，这个Cookie是还在的，但是你第二天再去打开肯定这个Cookie没有了，需要重新登陆。**这个有效期后端可以强制来设置**
+1. 你可以设置cookie 的最长有效时间——Expires=<date> 可选
+2. 你可以设置在 cookie 失效之前需要经过的秒数——Max-Age=<non-zero-digit> 可选，假如二者 （指 Expires 和Max-Age） 均存在，那么 Max-Age 优先级更高。
+3. 指定 cookie 可以送达的主机名——Domain=<domain-value> ，一个网站只会带上自己域名的Cookie，是不会带上其他域名的Cookie，比如知乎在我的浏览器上有Cookie，百度在我的浏览器上有Cookie，但是你只能看到自己的Cookie，因为Cookie是按照域名分组的。
+4. 指定一个 URL 路径——Path=<path-value> 可选
+5. 一个带有安全属性的 cookie 只有在请求使用SSL和HTTPS协议的时候才会被发送到服务器——Secure 可选
+6. 设置了 HttpOnly 属性的 cookie 不能使用 JavaScript 经由  Document.cookie 属性、XMLHttpRequest 和  Request APIs 进行访问，以防范跨站脚本攻击（XSS）——HttpOnly 可选，**这里说的是防止用户用JavaScript改，但是可以通过其他方式修改(比如在开发者工具中修改)。我们通过代码验证**
+```
+document.cookie就可以看到Cookie
+```
+但是如果设置了HttpOnly，比如
+```
+          response.setHeader('Set-Cookie',`sign_in_email=${email};HttpOnly`)
+```
+那么
+```
+document.cookie就看不到这个Cookie了
+```
+7. 允许服务器设定一则 cookie 不随着跨域请求一起发送——SameSite=Lax 可选
+### 用户登录后展示用户的信息
+* 用到node.js的一个API，通过在Google上查询nodejs read cookie,找到[链接](https://stackoverflow.com/questions/3393854/get-and-set-a-single-cookie-with-node-js-http-server),它就是request.headers.cookie,我们通过代码就可以在nodejs上看到cookie的结果啦
+```
+    console.log(request.headers.cookie)
+```
+* 如果我们有多个cookie，那么就会用分号; 和空格来分隔，比如
+```
+sign_in_email=1@; a=1; b=2
+```
+* 我们用到的API——[replace](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String/replace)方法返回一个由替换值（replacement）替换一些或所有匹配的模式（pattern）后的新字符串。模式可以是一个字符串或者一个正则表达式，替换值可以是一个字符串或者一个每次匹配都要调用的回调函数。
+* 前端首页我们用一个占位符--zhan--来表示登陆成功后会被更改的地方
+```
+  <h1>你的用户名为--zhan--</h1>
+```
+* 后端代码增加部分用于验证cookie
+```
+    let cookie=request.headers.cookie.split('; ')//这里是分号空格来分隔这个cookie，这个cookie类似于a=1; b=2; sign_in_email=eee
+    let hash={}
+    for(i=0;i<cookie.length;i++){
+      let parts=cookie[i].split('=')//继续用=来分隔这个cookie
+      let key=parts[0]//第一部分就是前面设置的cookie名字          response.setHeader('Set-Cookie',`sign_in_email=${email};HttpOnly`)
+      let value=parts[1]//这个第二部分就是cookie的值，对应邮箱
+      hash[key]=value//把所有的信息都存入这个hash
+    }
+    let email=hash.sign_in_email
+    let users=fs.readFileSync('./db/users','utf8')//读取数据库中存储的信息
+    users=JSON.parse(users)//把数据库中的字符串转换为对象
+    let found=false
+    for(i=0;i<users.length;i++){
+      if(users[i].email===email){//如果数据库中有一个邮箱和用户的邮箱(也就是cookie的值)相同，就停止退出并把found=true
+        found=true
+        break
+      }
+    }
+    if(found){
+      string=string.replace('--zhan--',email)//如果found=true说明这个Cookie的值没问题，就把占位符替换，显示用户的邮箱
+    }
+    else{
+      string=string.replace('--zhan--','不知道')//如果found=false说明这个Cookie的值有问题，就把占位符替换，显示不知道
+    }
+```
+* 在开发者工具里面打开cookie点击×删除这个用户cookie就代表没有登陆，那么就不会显示用户名啦。
+### 处理了一个undefined的bug
+* 我在db/users里面写了一个{"e":"234234@qq","p":"1"}，这个邮箱email变成了e，那么在执行下面的代码的时候会一致显示undefined，如果把{"e":"234234@qq","p":"1"}改成{"email":"234234@qq","p":"1"}就没有问题了
+```
+    let email=hash.sign_in_email//这里会导致email为undefined
+    let users=fs.readFileSync('./db/users','utf8')
+    users=JSON.parse(users)
+    let found=false
+    for(i=0;i<users.length;i++){
+      if(users[i].email===email){//这样有一个i里面没有email，那么就是undefined===undefined，这样就会导致found=true
+        found=true
+        // console.log(users)
+        break
+      }
+    }
+    if(found){
+      string=string.replace('__zhan__', email)//email就是undefined，所以会显示undefined，不会继续执行下一步的else
+    }
+    else{
+      string=string.replace('__zhan__', '不知道')//不会执行到这里
+    }
+```
+
 
