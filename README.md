@@ -351,8 +351,11 @@ else if (path === '/sign_up' && method === 'POST') {//当在这个路径是POST�
         }
 ```
 ### 如果用户没有写邮箱，那么就不需要麻烦后端，只需要前端来验证这个即可，当然就算前端验证了，后端也会验证是否没有写邮箱的。
-* 主要思路就是用if return或者if...else来判断，代码如下
+* 主要思路就是用if来判断完成后返回这个函数，**[return](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/return)后就终止后面的代码操作了**，代码如下
 ```
+        $form.on('submit', (e) => {
+          最上面是有一个submit的监听函数
+          --------------这里的分割线---------------
             // $form.find('.error').text('')
             $form.find('.error').each((value,index)=>{//这个是为了刚开始清空文字，不然文字会一直显示不会消失
                 $(index).text('')
@@ -403,6 +406,7 @@ else {
         }
 ```
 * 还有问题存在，就是如果**同样的注册内容会重复保存，所以要修复这个问题**。增加部分代码来判断重复
+* 这里用到的[break](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/break)是**终止循环**
 ```
           let inUser=false//判断先设置为false
           for(i=0;i<users.length;i++){
