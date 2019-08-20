@@ -562,7 +562,7 @@ else{//如果不匹配就401验证失败
    ```
    7. 允许服务器设定一则 cookie 不随着跨域请求一起发送——SameSite=Lax 可选
 5. Cookie 遵守同源策略吗？
-也有，不过跟 AJAX 的同源策略稍微有些不同。
+**也有，不过跟 AJAX 的同源策略稍微有些不同**。
 当请求 qq.com 下的资源时，浏览器会默认带上 qq.com 对应的 Cookie，不会带上 baidu.com 对应的 Cookie
 当请求 v.qq.com 下的资源时，浏览器不仅会带上 v.qq.com 的Cookie，还会带上 qq.com 的 Cookie
 另外 Cookie 还可以根据路径做限制，请自行了解，这个功能用得比较少。  
