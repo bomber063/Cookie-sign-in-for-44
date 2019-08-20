@@ -561,6 +561,11 @@ else{//如果不匹配就401验证失败
    document.cookie就看不到这个Cookie了
    ```
    7. 允许服务器设定一则 cookie 不随着跨域请求一起发送——SameSite=Lax 可选
+5. Cookie 遵守同源策略吗？
+也有，不过跟 AJAX 的同源策略稍微有些不同。
+当请求 qq.com 下的资源时，浏览器会默认带上 qq.com 对应的 Cookie，不会带上 baidu.com 对应的 Cookie
+当请求 v.qq.com 下的资源时，浏览器不仅会带上 v.qq.com 的Cookie，还会带上 qq.com 的 Cookie
+另外 Cookie 还可以根据路径做限制，请自行了解，这个功能用得比较少。  
 ### 用户登录后展示用户的信息
 * 用到node.js的一个API，通过在Google上查询nodejs read cookie,找到[链接](https://stackoverflow.com/questions/3393854/get-and-set-a-single-cookie-with-node-js-http-server),它就是request.headers.cookie,我们通过代码就可以在nodejs上看到cookie的结果啦
 ```
