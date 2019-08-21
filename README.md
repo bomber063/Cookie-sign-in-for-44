@@ -389,6 +389,7 @@ else if (path === '/sign_up' && method === 'POST') {//当在这个路径是POST�
 * 另一个node.js的API——[fs.writeFileSync](http://nodejs.cn/api/fs.html#fs_fs_writefilesync_file_data_options).用于在某个路径存储某些数据。
 * 对象是不方便保存的，对象是内存里面的东西，保存下来会显示[object Object]，必须转换为字符串，所以还要一个转换为字符串化的API——JSON.parsef
 * 如果前面已经存入了[object Object]，那么就要用到[try...catch](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/try...catch)语句将能引发错误的代码放在try块中，并且对应一个响应，然后有异常被抛出。catch子句包含try块中抛出异常时要执行的语句。也就是，你想让try语句中的内容成功， 如果没成功，你想控制接下来发生的事情，这时你可以在catch语句中实现。 如果在try块中有任何一个语句（或者从try块中调用的函数）抛出异常，控制立即转向catch子句。如果在try块中没有异常抛出，会跳过catch子句。
+* [JSON.stringify](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify)方法是将一个JavaScript值(对象或者数组)转换为一个 JSON字符串，如果指定了replacer是一个函数，则可以选择性的替换值，或者如果指定了replacer是一个数组，可选择性的仅包含数组指定的属性
 * 修改后端的代码
 ```
 else {
