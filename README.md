@@ -542,6 +542,7 @@ else{//如果不匹配就401验证失败
 1. 服务器通过Set-Cookie响应头设置Cookie
 2. 浏览器得到Cookie之后，每次请求都要带上Cookie
 3. 服务器读取Cookie就知道登陆用户的信息(比如email)
+4. 补充：只要是相同的源(或者相同的域名)访问都需要带上这个cookie头，一个网站只会带上自己域名的Cookie，是不会带上其他域名的Cookie，Cookie是跟着域名一起的
 * 问题
 1. 如果在Chrome登陆得到Cookie，用Safari访问，Safari会带上Cookie吗？不会，比如你在chrome浏览器登陆知乎，那么你在手机上还是需要重新登陆知乎。它只认识那张票(cookie)，这个票(cookie)是跟着浏览器走的。
 2. Cookie存在哪里——window里面存在C盘的一个文件里面，其他系统存在E盘文件，一般不让你去找到它，它不希望你改动它。
