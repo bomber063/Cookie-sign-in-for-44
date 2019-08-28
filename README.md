@@ -55,7 +55,7 @@ else if(path==='/sign_up'){
 ```
 * 这样当我们在主页找到路径/sign_up的时候就可以找到该sign_up.html网页啦,可以通过打开开发者工具中看到sign_up下面的Response,也就是响应体。
 * 我们在Response Header的view source里面还可以看到我们写的Content-Type: text/html;charset=utf-8
-* 此时可以先把cookie清空，点击cookie，在Application里面Storage里面的Cookies，里面有一个clear al，也就是禁止标志，一个圈里面一个斜杆——⊘
+* 此时可以先把cookie清空，点击cookie，在Application里面Storage里面的Cookies，里面有一个clear all，也就是禁止标志，一个圈里面一个斜杆——⊘，还有一个×标识，代表清除某个选定的Cookie
 
 ### 增加代码达到注册界面的基本要求
 * html文件代码
